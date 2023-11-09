@@ -8,10 +8,12 @@ from datetime import datetime
 import requests
 import json
 import os 
-
-
-from keboola.component.base import ComponentBase
+import logging
+import requests
+import xml.etree.ElementTree as ET
 from keboola.component.exceptions import UserException
+from keboola.component.base import ComponentBase
+
 
 # configuration variables
 KEY_USERNAME = 'username'
@@ -58,13 +60,24 @@ def trigger_job(url: str,username: str, password: str, process_id: str, atom_id:
     # Send the HTTP POST request
     response = requests.post(url, headers=headers, data=xml_request_body, auth=auth)
 
-    # Check the response
-    if response.status_code == 200:
-        print("Request successful")
-        return response.text
-    else:
-        print("Request failed with status code:", response.status_code)
-        return None
+    # Check the response status code
+    if response.status_code != 200:
+        logging.error("Request failed with status code: %s, response: %s", response.status_code, response.text)
+        raise UserException(f"Failed to trigger the Boomi job, response code: {response.status_code}")
+
+    # Parse the XML response
+    try:
+        root = ET.fromstring(response.text)
+        # Check if the response contains ExecutionRequest and requestId
+        if root.tag.endswith('ExecutionRequest') and 'requestId' in root.attrib:
+            logging.info("Boomi job triggered successfully with requestId: %s", root.attrib['requestId'])
+        else:
+            raise UserException("Boomi API did not return a success message.")
+    except ET.ParseError as e:
+        logging.error("Failed to parse XML response: %s", e)
+        raise UserException("Failed to parse the Boomi API response.")
+
+    return response.text
 
 class Component(ComponentBase):
 
@@ -102,8 +115,8 @@ if __name__ == "__main__":
         # this triggers the run method by default and is controlled by the configuration.action parameter
         comp.execute_action()
     except UserException as exc:
-        logging.exception(exc)
+        logging.exception("User configuration error: %s", exc)
         exit(1)
     except Exception as exc:
-        logging.exception(exc)
+        logging.exception("Unexpected error: %s", exc)
         exit(2)
