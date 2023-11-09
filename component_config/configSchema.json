@@ -2,18 +2,38 @@
   "type": "object",
   "title": "extractor configuration",
   "required": [
-    "print_hello"
+    "username",
+    "password",
+    "process_id",
+    "atom_id",
+    "url"
   ],
   "properties": {
-    "print_hello": {
-      "type": "boolean",
-      "title": "Print Hello",
+    "username": {
+      "type": "string",
+      "title": "username",
       "propertyOrder": 1
     },
-    "debug": {
-      "type": "boolean",
-      "title": "Debug",
+    "password": {
+      "type": "string",
+      "format": "password",
+      "title": "password",
       "propertyOrder": 2
+    },
+    "process_id": {
+      "type": "string",
+      "title": "process_id",
+      "propertyOrder": 4
+    },
+    "atom_id": {
+      "type": "string",
+      "title": "atom_id",
+      "propertyOrder": 5
+    },
+    "url": {
+      "type": "string",
+      "title": "url",
+      "propertyOrder": 3
     }
   }
 }
