@@ -12,27 +12,32 @@
     "username": {
       "type": "string",
       "title": "username",
+      "description": "The username required for authentication.",
       "propertyOrder": 1
     },
     "password": {
       "type": "string",
       "format": "password",
       "title": "password",
+      "description": "The password required for authentication.",
       "propertyOrder": 2
     },
     "process_id": {
       "type": "string",
       "title": "process_id",
+      "description": "Identifier for the process to be used.",
       "propertyOrder": 4
     },
     "atom_id": {
       "type": "string",
       "title": "atom_id",
+      "description": "Identifier for the atom involved in the process.",
       "propertyOrder": 5
     },
     "url": {
       "type": "string",
       "title": "url",
+      "description": "The endpoint URL for the job.",
       "propertyOrder": 3
     }
   }
