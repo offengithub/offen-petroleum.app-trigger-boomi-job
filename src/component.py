@@ -13,6 +13,9 @@ import requests
 import xml.etree.ElementTree as ET
 from keboola.component.exceptions import UserException
 from keboola.component.base import ComponentBase
+import json 
+import xmltodict
+
 
 
 # configuration variables
@@ -76,8 +79,14 @@ def trigger_job(url: str,username: str, password: str, process_id: str, atom_id:
     except ET.ParseError as e:
         logging.error("Failed to parse XML response: %s", e)
         raise UserException("Failed to parse the Boomi API response.")
+    
+    # Convert XML to a Python dictionary
+    dict_data = xmltodict.parse(response.text)
 
-    return response.text
+    # Convert the Python dictionary to a JSON string
+    response_json_data = json.dumps(dict_data, indent=4)
+
+    return response_json_data
 
 class Component(ComponentBase):
 
