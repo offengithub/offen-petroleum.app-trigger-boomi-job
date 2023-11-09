@@ -1,0 +1,1 @@
+This applications takes in username, api  url, password and other params to externally trigger a boomi job via an API

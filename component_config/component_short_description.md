@@ -1,0 +1,1 @@
+This application takes in a set of params and trigger a boomi job via an API
