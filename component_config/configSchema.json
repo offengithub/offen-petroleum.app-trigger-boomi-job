@@ -6,7 +6,8 @@
     "password",
     "process_id",
     "atom_id",
-    "url"
+    "job_trigger_url",
+    "job_status_url"
   ],
   "properties": {
     "username": {
@@ -26,19 +27,37 @@
       "type": "string",
       "title": "process_id",
       "description": "Identifier for the process to be used.",
-      "propertyOrder": 4
+      "propertyOrder": 5
     },
     "atom_id": {
       "type": "string",
       "title": "atom_id",
       "description": "Identifier for the atom involved in the process.",
-      "propertyOrder": 5
+      "propertyOrder": 6
     },
-    "url": {
+    "job_trigger_url": {
       "type": "string",
-      "title": "url",
-      "description": "The endpoint URL for the job.",
+      "title": "job_trigger_url",
+      "description": "The endpoint URL for triggering the job.",
       "propertyOrder": 3
+    },
+    "job_status_url": {
+      "type": "string",
+      "title": "job_status_url",
+      "description": "The endpoint URL for checking the job status.",
+      "propertyOrder": 4
+    },
+    "poll_frequnecy": {
+      "type": "string",
+      "title": "poll frequency",
+      "description": "The time interval to check job status in seconds.Not reqyuired! Defaults to 600 seconds if not provided",
+      "propertyOrder": 7
+    },
+    "webhook_url": {
+      "type": "string",
+      "title": "Teams webhook url",
+      "description": "OPTIONAL: Please input a webhook url if you want to get status update on your teamms channel",
+      "propertyOrder": 8
     }
   }
 }
