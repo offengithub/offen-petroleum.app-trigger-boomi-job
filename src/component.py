@@ -204,7 +204,7 @@ class Component(ComponentBase):
             print(triger_response)
         else:
             print('Job could not be triggered')
-        time.sleep(120)
+        time.sleep(180)
         
 
         # Check job status every 10 minutes
