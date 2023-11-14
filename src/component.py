@@ -116,8 +116,8 @@ def trigger_job(url: str,username: str, password: str, process_id: str, atom_id:
     return response_json_data
 
 
-def check_job_status(url: str,username: str, password: str, process_id: str, atom_id: str, start_time = (current_time - timedelta(days=1)).isoformat(), 
-                           end_time=current_time.isoformat()):
+def check_job_status(url: str,username: str, password: str, process_id: str, atom_id: str, start_time , 
+                           end_time):
     """
     Queries the execution status of a Snowflake integration process in Boomi Atomsphere.
 
@@ -204,47 +204,48 @@ class Component(ComponentBase):
             print(triger_response)
         else:
             print('Job could not be triggered')
-        time.sleep(180)
+        time.sleep(300)
         
-
+        current_time=datetime.now(timezone.utc)
+        status_response = check_job_status(
+                job_status_url,
+                username,
+                password,
+                process_id,
+                atom_id,
+                start_time=(current_time - timedelta(days=1)).isoformat(),
+                end_time=current_time.isoformat()
+            )
+    
         # Check job status every 10 minutes
         while True:
-            current_time = datetime.now()
-            status_response= check_job_status(
-            job_status_url,
-            username,
-            password,
-            process_id, 
-            atom_id
-            #start_time=current_time.isoformat(),
-            #end_time=current_time.isoformat()
-            )
-             #(current_time - timedelta(days=1)).isoformat()
             if status_response:
-            # Extract the job status
                 response_dict = json.loads(status_response)
                 formatted_response = json.dumps(response_dict, indent=4)
                 print(formatted_response)
-                # Accessing the 'bns:result' key which is expected to be a list
-                results = response_dict.get('bns:QueryResult', {})
-                #print("DATA TYPE RESULTS")
-                #print(type(results))
-                execution_record = results.get('bns:result', {})[-1]
-                #execution_record = results.get('bns:result', {})
-                print(type(execution_record))
-                #print(len(execution_record))
-                #print("EXECUTION RESULTS")
-                #print(execution_record)
 
-                # Check if 'execution_record' is indeed a dictionary
-                if execution_record and isinstance(execution_record, dict):
-                    job_status = execution_record.get('bns:status', 'Unknown Status')
-                    job_name = execution_record.get('bns:processName', 'Unknown process name')
-                    job_run_time = execution_record.get('bns:executionDuration', 'cant access runtime')
-                    if job_status == "COMPLETE":
-                        print("Job completed successfully")
-                        print(f"job: {job_name} is {job_status}. Runtime:{ceil(float(job_run_time)/1000/60)} minutes")
-                        job_status_message=f"job: {job_name} is {job_status}. Runtime:{ceil(float(job_run_time)/1000/60)} minutes"
+                results = response_dict.get('bns:QueryResult', {})
+                print("DATA TYPE RESULTS")
+                #print(results)
+
+                execution_records = results.get('bns:result', [])
+                valid_execution_record = None
+
+                for execution_record in reversed(execution_records):
+                    if isinstance(execution_record, dict) and execution_record.get('bns:status', '') != "DISCARDED":
+                        valid_execution_record = execution_record
+                        break
+
+                if valid_execution_record:
+                    job_status = valid_execution_record.get('bns:status', 'Unknown Status')
+                    job_name = valid_execution_record.get('bns:processName', 'Unknown process name')
+                    job_run_time = valid_execution_record.get('bns:executionDuration', 'cant access runtime')
+
+                    if job_status in ("COMPLETE", "COMPLETE_WARN"):
+                        print(f"Job completed successfully with status as {job_status}")
+                        runtime_minutes = round(float(job_run_time) / 1000 / 60,2)
+                        job_status_message = f"job: {job_name} is {job_status}. Runtime: {runtime_minutes} minutes current_time: {current_time}"
+                        print(job_status_message)
                         if webhook_url:
                             post_to_teams(webhook_url, job_status_message)
                         break
@@ -252,16 +253,17 @@ class Component(ComponentBase):
                     elif job_status == "ERROR":
                         print("Error occurred while checking job status")
                         break
-                    # If the job status is not COMPLETE or Error, print a message indicating that the job is still running
+
                     else:
-                        job_status_message=f"Job status: {job_status}. Checking again in 10 minutes."
+                        job_status_message = f"Job status: {job_status}. process_id: {process_id} atom_id: {atom_id} current_time: {current_time}. \n Checking again in {poll_frequency} seconds."
+                        print(job_status_message)
                         if webhook_url:
                             post_to_teams(webhook_url, job_status_message)
+
             else:
                 print("No status response received. Checking again in 10 minutes.")
 
-            time.sleep(int(poll_frequency))  # Wait for 10 minutes or 600 seconds before checking again
-        #self.write_manifest(out_table)
+            time.sleep(int(poll_frequency))  # Wait for specified time before checking again
 
 """
         Main entrypoint
