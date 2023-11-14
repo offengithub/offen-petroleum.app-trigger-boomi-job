@@ -7,7 +7,8 @@
     "process_id",
     "atom_id",
     "job_trigger_url",
-    "job_status_url"
+    "job_status_url",
+    "poll_frequency"
   ],
   "properties": {
     "username": {
@@ -47,10 +48,10 @@
       "description": "The endpoint URL for checking the job status.",
       "propertyOrder": 4
     },
-    "poll_frequnecy": {
+    "poll_frequency": {
       "type": "string",
-      "title": "poll frequency",
-      "description": "The time interval to check job status in seconds.Not reqyuired! Defaults to 600 seconds if not provided",
+      "title": "poll_frequency",
+      "description": "The time interval to check job status in seconds",
       "propertyOrder": 7
     },
     "webhook_url": {

@@ -36,7 +36,7 @@ KEY_WEBHOOK_URL ='webhook_url'
 
 # list of mandatory parameters => if some is missing,
 # component will fail with readable message on initialization.
-REQUIRED_PARAMETERS = [KEY_USERNAME,KEY_PASSWORD,KEY_PROCESS_ID,KEY_ATOM_ID, KEY_JOB_STATUS_URL,KEY_JOB_TRIGGER_URL ]
+REQUIRED_PARAMETERS = [KEY_USERNAME,KEY_PASSWORD,KEY_PROCESS_ID,KEY_ATOM_ID, KEY_JOB_STATUS_URL,KEY_JOB_TRIGGER_URL,KEY_POLL_FREQUENCY]
 REQUIRED_IMAGE_PARS = []
 
 
@@ -186,7 +186,7 @@ class Component(ComponentBase):
        # check for missing configuration parameters
         self.validate_configuration_parameters(REQUIRED_PARAMETERS)
 
-        #webhook_url = 'https://offenpet.webhook.office.com/webhookb2/863639ee-1bda-4fc3-a3f3-efbc70cf42b2@326321f9-9e95-45c7-8701-8165523a9735/IncomingWebhook/7600ef1aed0049afb4dc1eec2fbbd8a2/f2164844-b26c-481c-b057-65cec085a8dd'
+        
         username = self.configuration.parameters.get(KEY_USERNAME)
         password = self.configuration.parameters.get(KEY_PASSWORD)
         process_id = self.configuration.parameters.get(KEY_PROCESS_ID)
