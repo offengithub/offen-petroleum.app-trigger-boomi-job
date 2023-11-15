@@ -202,9 +202,10 @@ class Component(ComponentBase):
         if triger_response:
             print('=============================================================== printing job trigger response ===========================================================================')
             print(triger_response)
+            #post_to_teams(webhook_url, triger_response)
         else:
             print('Job could not be triggered')
-        time.sleep(300)
+        time.sleep(30)
         
         current_time=datetime.now(timezone.utc)
         status_response = check_job_status(
