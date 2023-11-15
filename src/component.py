@@ -197,7 +197,7 @@ class Component(ComponentBase):
         webhook_url=self.configuration.parameters.get(KEY_WEBHOOK_URL)
 
         # trigger the job
-        '''
+        
         triger_response =trigger_job(job_trigger_url, username, password, process_id, atom_id)
         if triger_response:
             print('=============================================================== printing job trigger response ===========================================================================')
@@ -205,7 +205,7 @@ class Component(ComponentBase):
         else:
             print('Job could not be triggered')
         time.sleep(300)
-        '''
+        
         current_time=datetime.now(timezone.utc)
         status_response = check_job_status(
                 job_status_url,
