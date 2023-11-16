@@ -200,11 +200,11 @@ class Component(ComponentBase):
         
         triger_response =trigger_job(job_trigger_url, username, password, process_id, atom_id)
         if triger_response:
-            print('=============================================================== printing job trigger response ===========================================================================')
-            print(triger_response)
+            logging.info('=======printing job trigger response =======')
+            logging.info(triger_response)
             #post_to_teams(webhook_url, triger_response)
         else:
-            print('Job could not be triggered')
+            logging.info('Job could not be triggered')
         time.sleep(30)
         
         current_time=datetime.now(timezone.utc)
@@ -223,11 +223,8 @@ class Component(ComponentBase):
             if status_response:
                 response_dict = json.loads(status_response)
                 formatted_response = json.dumps(response_dict, indent=4)
-                print(formatted_response)
 
                 results = response_dict.get('bns:QueryResult', {})
-                print("DATA TYPE RESULTS")
-                #print(results)
 
                 execution_records = results.get('bns:result', [])
                 valid_execution_record = None
@@ -243,26 +240,30 @@ class Component(ComponentBase):
                     job_run_time = valid_execution_record.get('bns:executionDuration', 'cant access runtime')
 
                     if job_status in ("COMPLETE", "COMPLETE_WARN"):
-                        print(f"Job completed successfully with status as {job_status}")
+                        logging.info(f"Job completed successfully with status as {job_status}")
                         runtime_minutes = round(float(job_run_time) / 1000 / 60,2)
                         job_status_message = f"job: {job_name} is {job_status}. Runtime: {runtime_minutes} minutes current_time: {current_time}"
-                        print(job_status_message)
+                        logging.info(job_status_message)
                         if webhook_url:
                             post_to_teams(webhook_url, job_status_message)
+                        else:
+                            pass
                         break
 
                     elif job_status == "ERROR":
-                        print("Error occurred while checking job status")
+                        logging.info("Error occurred while checking job status")
                         break
 
                     else:
                         job_status_message = f"Job status: {job_status}. process_id: {process_id} atom_id: {atom_id} current_time: {current_time}. \n Checking again in {poll_frequency} seconds."
-                        print(job_status_message)
+                        logging.info(job_status_message)
                         if webhook_url:
                             post_to_teams(webhook_url, job_status_message)
+                        else:
+                            pass
 
             else:
-                print("No status response received. Checking again in 10 minutes.")
+                logging.info("No status response received. Checking again in 10 minutes.")
 
             time.sleep(int(poll_frequency))  # Wait for specified time before checking again
 
