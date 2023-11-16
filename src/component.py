@@ -42,6 +42,7 @@ KEY_WEBHOOK_URL ='webhook_url'
 REQUIRED_PARAMETERS = [KEY_USERNAME,KEY_PASSWORD,KEY_PROCESS_ID,KEY_ATOM_ID, KEY_JOB_STATUS_URL,KEY_JOB_TRIGGER_URL,KEY_POLL_FREQUENCY]
 REQUIRED_IMAGE_PARS = []
 
+'''
 def configure_logging():
     logging.basicConfig(level=logging.INFO)
     logger = logging.getLogger()
@@ -54,6 +55,11 @@ def configure_logging():
     logger.removeHandler(logger.handlers[0])
 
 configure_logging()
+'''
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger()
+
 
 def post_to_teams(webhook_url, message):
     """
@@ -289,8 +295,6 @@ class Component(ComponentBase):
 """
 if __name__ == "__main__":
     try:
-        configure_logging()
-
         comp = Component()
         logging.info("Component started")
         # this triggers the run method by default and is controlled by the configuration.action parameter
