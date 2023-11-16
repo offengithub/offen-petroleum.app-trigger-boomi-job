@@ -6,6 +6,9 @@ import csv
 import logging
 from datetime import datetime
 import requests
+import logging_gelf.handlers
+import logging_gelf.formatters
+import os
 import json
 import os 
 import logging
@@ -39,6 +42,18 @@ KEY_WEBHOOK_URL ='webhook_url'
 REQUIRED_PARAMETERS = [KEY_USERNAME,KEY_PASSWORD,KEY_PROCESS_ID,KEY_ATOM_ID, KEY_JOB_STATUS_URL,KEY_JOB_TRIGGER_URL,KEY_POLL_FREQUENCY]
 REQUIRED_IMAGE_PARS = []
 
+def configure_logging():
+    logging.basicConfig(level=logging.INFO)
+    logger = logging.getLogger()
+    gelf_handler = logging_gelf.handlers.GELFTCPSocketHandler(
+        host=os.getenv('KBC_LOGGER_ADDR'), 
+        port=int(os.getenv('KBC_LOGGER_PORT'))
+    )
+    gelf_handler.setFormatter(logging_gelf.formatters.GELFFormatter(null_character=True))
+    logger.addHandler(gelf_handler)
+    logger.removeHandler(logger.handlers[0])
+
+configure_logging()
 
 def post_to_teams(webhook_url, message):
     """
@@ -197,15 +212,17 @@ class Component(ComponentBase):
         webhook_url=self.configuration.parameters.get(KEY_WEBHOOK_URL)
 
         # trigger the job
-        
+        '''
         triger_response =trigger_job(job_trigger_url, username, password, process_id, atom_id)
         if triger_response:
-            logging.info('=======printing job trigger response =======')
+            logging.info('=======job trigger response =======')
             logging.info(triger_response)
             #post_to_teams(webhook_url, triger_response)
         else:
             logging.info('Job could not be triggered')
         time.sleep(30)
+        '''
+        logging.info('Monitoring job started')
         
         current_time=datetime.now(timezone.utc)
         status_response = check_job_status(
@@ -272,7 +289,10 @@ class Component(ComponentBase):
 """
 if __name__ == "__main__":
     try:
+        configure_logging()
+
         comp = Component()
+        logging.info("Component started")
         # this triggers the run method by default and is controlled by the configuration.action parameter
         comp.execute_action()
     except UserException as exc:
