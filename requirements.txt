@@ -4,3 +4,4 @@ keboola.http-client
 mock
 freezegun
 xmltodict
+logging_gelf
