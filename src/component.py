@@ -227,16 +227,15 @@ class Component(ComponentBase):
         webhook_url=self.configuration.parameters.get(KEY_WEBHOOK_URL)
 
         # trigger the job
-        
+        '''
         triger_response =trigger_job(job_trigger_url, username, password, process_id, atom_id)
         if triger_response:
             logging.info('=======job trigger response =======')
             logging.info(triger_response)
-            #post_to_teams(webhook_url, triger_response)
         else:
             logging.info('Job could not be triggered')
-        time.sleep(30)
-        
+        time.sleep(300)
+        '''
         logging.info('Monitoring job started')
         
         current_time=datetime.now(timezone.utc)
@@ -306,7 +305,7 @@ class Component(ComponentBase):
 """
 if __name__ == "__main__":
     try:
-        logging.info("Component started")
+        #logging.info("Component started")
         comp = Component()
     
         # this triggers the run method by default and is controlled by the configuration.action parameter
