@@ -29,7 +29,7 @@ from math import ceil
 start_time = time.time()
 
 # Maximum allowed runtime in seconds (3000 seconds)
-MAX_RUNTIME_SECONDS = 2800
+MAX_RUNTIME_SECONDS = 7060
 
 # Helper function to check if the script has exceeded the maximum runtime
 def check_runtime():
