@@ -9,6 +9,7 @@ import requests
 import logging_gelf.handlers
 import logging_gelf.formatters
 import os
+import sys
 import json
 import os 
 import logging
@@ -36,36 +37,19 @@ KEY_JOB_STATUS_URL = 'job_status_url'
 KEY_JOB_TRIGGER_URL = 'job_trigger_url'
 KEY_POLL_FREQUENCY ='poll_frequency'
 KEY_WEBHOOK_URL ='webhook_url'
+KEY_TRIGGER_JOB_RUN='trigger_job_run'
 
 # list of mandatory parameters => if some is missing,
 # component will fail with readable message on initialization.
-REQUIRED_PARAMETERS = [KEY_USERNAME,KEY_PASSWORD,KEY_PROCESS_ID,KEY_ATOM_ID, KEY_JOB_STATUS_URL,KEY_JOB_TRIGGER_URL,KEY_POLL_FREQUENCY]
+REQUIRED_PARAMETERS = [KEY_USERNAME,KEY_PASSWORD,KEY_PROCESS_ID,KEY_ATOM_ID, KEY_JOB_STATUS_URL,KEY_JOB_TRIGGER_URL,KEY_POLL_FREQUENCY,KEY_TRIGGER_JOB_RUN]
 REQUIRED_IMAGE_PARS = []
 
-'''
-def configure_logging():
-    logging.basicConfig(level=logging.INFO)
-    logger = logging.getLogger()
-    gelf_handler = logging_gelf.handlers.GELFTCPSocketHandler(
-        host=os.getenv('KBC_LOGGER_ADDR'), 
-        port=int(os.getenv('KBC_LOGGER_PORT'))
-    )
-    gelf_handler.setFormatter(logging_gelf.formatters.GELFFormatter(null_character=True))
-    logger.addHandler(gelf_handler)
-    logger.removeHandler(logger.handlers[0])
-
-configure_logging()
-'''
 
 
 logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
 logger = logging.getLogger(__name__)
-
-
-
-
 
 
 def post_to_teams(webhook_url, message):
@@ -225,18 +209,30 @@ class Component(ComponentBase):
         atom_id = self.configuration.parameters.get(KEY_ATOM_ID)
         poll_frequency=self.configuration.parameters.get(KEY_POLL_FREQUENCY)
         webhook_url=self.configuration.parameters.get(KEY_WEBHOOK_URL)
+        trigger_job_run=int(self.configuration.parameters.get(KEY_TRIGGER_JOB_RUN))
+
+        if trigger_job_run == 1:
 
         # trigger the job
-        '''
-        triger_response =trigger_job(job_trigger_url, username, password, process_id, atom_id)
-        if triger_response:
-            logging.info('=======job trigger response =======')
-            logging.info(triger_response)
+            triger_response =trigger_job(job_trigger_url, username, password, process_id, atom_id)
+            if triger_response:
+                logging.info('=======job trigger response =======')
+                logging.info(triger_response)
+            else:
+                logging.info('Job could not be triggered')
+
+
+        elif trigger_job_run==0:
+            logging.info("Skipping job trigger to monitor the existing job status")
         else:
-            logging.info('Job could not be triggered')
-        time.sleep(300)
-        '''
+            logging.error("Please input a value for the trigger job run value. 1 for YES and 0 for NO")
+            sys.exit()
+        
+
         logging.info('Monitoring job started')
+        
+
+        time.sleep(180)
         
         current_time=datetime.now(timezone.utc)
         status_response = check_job_status(
@@ -245,7 +241,7 @@ class Component(ComponentBase):
                 password,
                 process_id,
                 atom_id,
-                start_time=(current_time - timedelta(days=5)).isoformat(),
+                start_time=(current_time - timedelta(days=3)).isoformat(),
                 end_time=current_time.isoformat()
             )
     

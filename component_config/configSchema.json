@@ -8,7 +8,8 @@
     "atom_id",
     "job_trigger_url",
     "job_status_url",
-    "poll_frequency"
+    "poll_frequency",
+    "trigger_job_run"
   ],
   "properties": {
     "username": {
@@ -59,6 +60,12 @@
       "title": "Teams webhook url",
       "description": "OPTIONAL: Please input a webhook url if you want to get status update on your teamms channel",
       "propertyOrder": 8
+    },
+    "trigger_job_run": {
+      "type": "integer",
+      "title": "trigger_job_run",
+      "description": "Do you want to trigger the job or just monitor an existing process? 1 for YES and 0 for NO",
+      "propertyOrder": 9
     }
   }
 }
