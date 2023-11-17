@@ -29,7 +29,7 @@ from math import ceil
 start_time = time.time()
 
 # Maximum allowed runtime in seconds (3000 seconds)
-MAX_RUNTIME_SECONDS = 3300
+MAX_RUNTIME_SECONDS = 2800
 
 # Helper function to check if the script has exceeded the maximum runtime
 def check_runtime():
@@ -273,6 +273,7 @@ class Component(ComponentBase):
                 valid_execution_record = None
 
                 for execution_record in reversed(execution_records):
+                    check_runtime()
                     print(execution_record)
                     if isinstance(execution_record, dict) and execution_record.get('bns:status', '') != "DISCARDED":
                         valid_execution_record = execution_record
@@ -285,6 +286,7 @@ class Component(ComponentBase):
                     job_run_time = valid_execution_record.get('bns:executionDuration', 'cant access runtime')
 
                     if job_status == "COMPLETE":
+                        check_runtime()
                         logging.info(f"Job completed successfully with status as {job_status}")
                         runtime_minutes = round(float(job_run_time) / 1000 / 60,2)
                         job_status_message = f"job: {job_name} is {job_status}. Runtime: {runtime_minutes} minutes current_time: {current_time}"
