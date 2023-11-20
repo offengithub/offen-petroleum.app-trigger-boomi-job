@@ -23,7 +23,7 @@ from datetime import datetime, timezone, timedelta
 import time
 from math import ceil 
 
-
+'''
 
 # Start time of the script
 start_time = time.time()
@@ -36,7 +36,7 @@ def check_runtime():
     if time.time() - start_time > MAX_RUNTIME_SECONDS:
         logging.info("Maximum runtime reached, exiting.")
         sys.exit(0)
-
+'''
 
 current_time=datetime.now(timezone.utc)
 
@@ -224,7 +224,7 @@ class Component(ComponentBase):
         trigger_job_run=int(self.configuration.parameters.get(KEY_TRIGGER_JOB_RUN))
 
         if trigger_job_run == 1:
-            check_runtime() 
+            #check_runtime() 
 
         # trigger the job
             triger_response =trigger_job(job_trigger_url, username, password, process_id, atom_id)
@@ -236,7 +236,7 @@ class Component(ComponentBase):
 
 
         elif trigger_job_run==0:
-            check_runtime() 
+            #check_runtime() 
             logging.info("Skipping job trigger to monitor the existing job status")
         else:
             logging.error("Please input a value for the trigger job run value. 1 for YES and 0 for NO")
@@ -261,11 +261,11 @@ class Component(ComponentBase):
     
         # Check job status every 10 minutes
         while True:
-            check_runtime() 
+            #check_runtime() 
             if status_response:
                 response_dict = json.loads(status_response)
                 formatted_response = json.dumps(response_dict, indent=4)
-                logging.info("Entered the loop")
+                logging.info("Checking job status")
 
                 results = response_dict.get('bns:QueryResult', {})
 
@@ -273,20 +273,20 @@ class Component(ComponentBase):
                 valid_execution_record = None
 
                 for execution_record in reversed(execution_records):
-                    check_runtime()
+                    #check_runtime()
                     print(execution_record)
                     if isinstance(execution_record, dict) and execution_record.get('bns:status', '') != "DISCARDED":
                         valid_execution_record = execution_record
                         break
 
                 if valid_execution_record:
-                    check_runtime() 
+                    #check_runtime() 
                     job_status = valid_execution_record.get('bns:status', 'Unknown Status')
                     job_name = valid_execution_record.get('bns:processName', 'Unknown process name')
                     job_run_time = valid_execution_record.get('bns:executionDuration', 'cant access runtime')
 
                     if job_status == "COMPLETE":
-                        check_runtime()
+                        #check_runtime()
                         logging.info(f"Job completed successfully with status as {job_status}")
                         runtime_minutes = round(float(job_run_time) / 1000 / 60,2)
                         job_status_message = f"job: {job_name} is {job_status}. Runtime: {runtime_minutes} minutes current_time: {current_time}"
@@ -311,10 +311,10 @@ class Component(ComponentBase):
 
             else:
                 logging.info("No status response received. Checking again in 10 minutes.")
-                check_runtime() 
+                #check_runtime() 
 
             time.sleep(int(poll_frequency))  # Wait for specified time before checking again
-        check_runtime() 
+        #check_runtime() 
 
 """
         Main entrypoint
