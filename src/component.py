@@ -228,20 +228,21 @@ class Component(ComponentBase):
         
 
         time.sleep(30)
+        current_time=datetime.now(timezone.utc)
+        start=(current_time - timedelta(hours=25)).isoformat()
+        end=current_time.isoformat()
         
-        print(f"START: {(current_time - timedelta(hours=25)).isoformat()}, STOP: {current_time.isoformat()}")
+        print(f"START: {start}, STOP: {end}")
         # Check job status every 10 minutes
         while True:
-            current_time=datetime.now(timezone.utc)
             status_response = check_job_status(
                 job_status_url,
                 username,
                 password,
                 process_id,
                 atom_id,
-                
-               (current_time - timedelta(hours=25)).isoformat(),
-               current_time.isoformat()
+                start,
+                end
                 )
              
             if status_response:
