@@ -227,7 +227,7 @@ class Component(ComponentBase):
         logging.info('Monitoring job started')
         
 
-        time.sleep(30)
+        time.sleep(60)
         current_time=datetime.now(timezone.utc)
         start=(current_time - timedelta(hours=25)).isoformat()
         end=current_time.isoformat()
@@ -260,7 +260,7 @@ class Component(ComponentBase):
                 for execution_record in reversed(execution_records):
                     
                     print(execution_record)
-                    if isinstance(execution_record, dict) and execution_record.get('bns:status', '') not in  ("DISCARDED", "ERROR"):
+                    if isinstance(execution_record, dict) and execution_record.get('bns:status', '') not in  ("DISCARDED", "ABORTED"):
                         valid_execution_record = execution_record
                         break
 
@@ -270,7 +270,7 @@ class Component(ComponentBase):
                     job_name = valid_execution_record.get('bns:processName', 'Unknown process name')
                     job_run_time = valid_execution_record.get('bns:executionDuration', 'cant access runtime')
 
-                    if job_status == "COMPLETE":
+                    if job_status in ("COMPLETE", "COMPLETE_WARN"):
                         
                         logging.info(f"Job completed successfully with status as {job_status}")
                         runtime_minutes = round(float(job_run_time) / 1000 / 60,2)
@@ -282,7 +282,7 @@ class Component(ComponentBase):
                             pass
                         break
 
-                    elif job_status not in  ("COMPLETE" , "COMPLETE WARN"):
+                    elif job_status == "ERROR":
                         logging.info("Error occurred while checking job status")
                         break
 
