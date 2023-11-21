@@ -2,13 +2,9 @@
 Template Component main class.
 
 """
-import csv
 import logging
 from datetime import datetime
 import requests
-import logging_gelf.handlers
-import logging_gelf.formatters
-import os
 import sys
 import json
 import os 
@@ -20,8 +16,7 @@ from keboola.component.base import ComponentBase
 import json 
 import xmltodict
 from datetime import datetime, timezone, timedelta
-import time
-from math import ceil 
+import time 
 
 
 current_time=datetime.now(timezone.utc)
@@ -232,22 +227,22 @@ class Component(ComponentBase):
         logging.info('Monitoring job started')
         
 
-        time.sleep(15)
+        time.sleep(30)
         
-        current_time=datetime.now(timezone.utc)
-        status_response = check_job_status(
+        print(f"START: {(current_time - timedelta(hours=25)).isoformat()}, STOP: {current_time.isoformat()}")
+        # Check job status every 10 minutes
+        while True:
+            current_time=datetime.now(timezone.utc)
+            status_response = check_job_status(
                 job_status_url,
                 username,
                 password,
                 process_id,
-                atom_id
-                ,
+                atom_id,
+                
                (current_time - timedelta(hours=25)).isoformat(),
                current_time.isoformat()
-            )
-        print(f"START {(current_time - timedelta(hours=25)).isoformat()},STOP{current_time.isoformat()}")
-        # Check job status every 10 minutes
-        while True:
+                )
              
             if status_response:
                 response_dict = json.loads(status_response)
@@ -286,7 +281,7 @@ class Component(ComponentBase):
                             pass
                         break
 
-                    elif job_status == "ERROR":
+                    elif job_status not in  ("COMPLETE" , "COMPLETE WARN"):
                         logging.info("Error occurred while checking job status")
                         break
 
